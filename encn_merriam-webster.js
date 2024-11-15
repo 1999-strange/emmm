@@ -42,20 +42,20 @@ class encn_MyDictionary {
             return [];
         }
 
-        let dictionary = doc.querySelector('body');
+        let dictionary = doc.querySelector('.entry-header');
         if (!dictionary) return notes; // return empty notes
 
-        let expression = T(dictionary.querySelector('h1.hword'));
-        let reading = T(dictionary.querySelector('.pron-spell-content .prs .pr')); // Adjusted to match the structure of pronunciation
+        let expression = T(dictionary.querySelector('h1.hword')); // Updated for correct header element
+        let reading = T(doc.querySelector('.pr')); // Adjusted to match the correct structure of pronunciation
 
-        let sound = dictionary.querySelector('.play-pron');
-        let audios = sound ? [sound.dataset.file] : [];
+        let sound = doc.querySelector('.play-pron');
+        let audios = sound ? [sound.getAttribute('data-file')] : [];
 
         // make definition segment
         let definitions = [];
-        let defblocks = dictionary.querySelectorAll('.vg .sb') || [];
+        let defblocks = doc.querySelectorAll('.vg .sb') || [];
         for (const defblock of defblocks) {
-            let pos = T(defblock.querySelector('.fl'));
+            let pos = T(defblock.querySelector('.fl')); // Part of speech
             pos = pos ? `<span class="pos">${pos}</span>` : '';
             let eng_tran = T(defblock.querySelector('.dtText'));
             if (!eng_tran) continue;
@@ -66,7 +66,7 @@ class encn_MyDictionary {
             definition += `${pos}${tran}`;
 
             // make example segment
-            let examps = defblock.querySelectorAll('.ex-sent') || '';
+            let examps = defblock.querySelectorAll('.ex-sent.t') || '';
             if (examps.length > 0) {
                 definition += '<ul class="sents">';
                 for (const examp of examps) {
