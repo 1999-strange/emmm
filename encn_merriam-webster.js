@@ -42,11 +42,11 @@ class encn_MyDictionary {
             return [];
         }
 
-        let dictionary = doc.querySelector('.entry-attr');
+        let dictionary = doc.querySelector('body');
         if (!dictionary) return notes; // return empty notes
 
         let expression = T(dictionary.querySelector('h1.hword'));
-        let reading = T(dictionary.querySelector('.prs .pr .mw-list'));
+        let reading = T(dictionary.querySelector('.pron-spell-content .prs .pr')); // Adjusted to match the structure of pronunciation
 
         let sound = dictionary.querySelector('.play-pron');
         let audios = sound ? [sound.dataset.file] : [];
@@ -66,7 +66,7 @@ class encn_MyDictionary {
             definition += `${pos}${tran}`;
 
             // make example segment
-            let examps = defblock.querySelectorAll('.ex-sent.t') || '';
+            let examps = defblock.querySelectorAll('.ex-sent') || '';
             if (examps.length > 0) {
                 definition += '<ul class="sents">';
                 for (const examp of examps) {
