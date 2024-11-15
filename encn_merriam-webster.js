@@ -2,6 +2,7 @@ class encn_MyDictionary {
     constructor() {
         // Initialization code if needed...
         this.baseUrl = "https://www.merriam-webster.com/dictionary/";
+        this.maxexample = 2;
     }
 
     async displayName() {
@@ -13,11 +14,24 @@ class encn_MyDictionary {
 
     setOptions(options) {
         this.options = options;
+        if (options.maxexample) {
+            // this.maxexample = options.maxexample;
+        }
     }
 
     async findTerm(word) {
         this.word = word;
-        let results = await Promise.all([this.findMerriamWebster(word)]);
+        let list = [];
+        let word_stem = await api.deinflect(word);
+        if (word.toLowerCase() != word) {
+            let lowercase = word.toLowerCase();
+            let lowercase_stem = await api.deinflect(lowercase);
+            list = [word, word_stem, lowercase, lowercase_stem];
+        } else {
+            list = [word, word_stem];
+        }
+        let promises = list.map((item) => this.findMerriamWebster(item));
+        let results = await Promise.all(promises);
         return [].concat(...results).filter(x => x);
     }
 
@@ -69,7 +83,8 @@ class encn_MyDictionary {
             let examps = defblock.querySelectorAll('.ex-sent.t') || '';
             if (examps.length > 0) {
                 definition += '<ul class="sents">';
-                for (const examp of examps) {
+                for (const [index, examp] of examps.entries()) {
+                    if (index >= this.maxexample) break; // Limit to maxexample
                     let eng_examp = T(examp) ? T(examp).replace(RegExp(expression, 'gi'), '<b>$&</b>') : '';
                     definition += eng_examp ? `<li class='sent'><span class='eng_sent'>${eng_examp}</span></li>` : '';
                 }
@@ -102,12 +117,4 @@ class encn_MyDictionary {
     }
 }
 
-// Example usage:
-const myDictionary = new encn_MyDictionary();
-myDictionary.findTerm('example')
-    .then(definition => {
-        console.log('Definition:', definition);
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
+
